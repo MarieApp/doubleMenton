@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Ai-Me | Au Pays de Marie - Routine 15 Jours Anti-Double Menton</title>
+  <!-- Tailwind CSS 2.2.19 -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Font Awesome 6.5.2 for icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <!-- Google Fonts 3.3.1 (Montserrat, for elegance)-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap">
+  <style>
+    body { font-family: 'Montserrat', Arial, sans-serif !important; background: #f9fafb; }
+    .brand { font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; letter-spacing: 0.01em; }
+    .exercise-card { background: #ffffff; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: box-shadow .2s; padding: 1.25rem; margin-bottom: 1.5rem;}
+    .exercise-card.active { border: 2px solid #85006e; }
+    .checked-day { background: #f3e8ff; border-color: #85006e; }
+    .main-purple { color: #85006e; }
+    .btn-purple { background: #85006e; color: white !important; }
+    .btn-purple:hover { background: #61004e;}
+    .progress-bg { background: linear-gradient(90deg,#85006e 0%, #ec4899 100%); }
+    .timer { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;}
+    @media print {
+      html,body { background: #fff !important; color: #000 !important; }
+      .no-print { display:none; }
+      .exercise-card, .checked-day { box-shadow:none !important; border:1px solid #ccc !important;}
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-10">
+  <header class="py-8 mb-8 w-full bg-gradient-to-tr from-purple-900 via-purple-600 to-pink-400 text-white text-center shadow">
+    <h1 class="text-3xl sm:text-4xl brand tracking-wide mb-1">Ai-Me <span class="text-pink-200">|</span> Au Pays de Marie</h1>
+    <p class="text-lg mt-1 font-medium">Routine 15 Jours Anti-Double Menton</p>
+    <p class="sm:text-base text-sm mt-2 max-w-xl mx-auto opacity-80 px-2">Suivez ce programme facial unique et progressif pour réduire l’apparence du double menton et tonifier le bas de votre visage.</p>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-2 sm:px-0">
+
+    <!-- Progression routine -->
+    <section class="mb-8 pt-2">
+      <div class="flex items-center justify-between mb-1">
+        <div class="text-sm font-semibold text-gray-700">Progression</div>
+        <div id="progress-value" class="text-xs bg-purple-100 px-2 py-1 rounded main-purple font-bold"></div>
+      </div>
+      <div class="w-full h-3 rounded overflow-hidden bg-purple-100 progress-bg">
+        <div id="progress-bar" class="h-3 transition-all duration-700 bg-gradient-to-r from-purple-900 via-pink-400 to-pink-200" style="width:0%"></div>
+      </div>
+      <ul id="progress-days" class="grid grid-cols-5 gap-2 mt-4">
+        <!-- Dynamically rendered -->
+      </ul>
+    </section>
+
+    <!-- JOUR et carte exercice -->
+    <section id="routine-section">
+      <!-- Rendered by JS -->
+    </section>
+
+    <!-- Instructions générale -->
+    <section class="mt-8 p-5 rounded-lg border border-purple-100 bg-white">
+      <h2 class="text-xl font-semibold mb-2 main-purple"><i class="fa-regular fa-hand-point-right pr-2"></i>Conseils pratiques</h2>
+      <ul class="list-disc list-inside text-gray-800 text-sm sm:text-base">
+        <li>Effectuez chaque exercice lentement en vous concentrant sur la zone travaillée.</li>
+        <li>Respirez profondément et adoptez une posture droite pour maximiser les résultats.</li>
+        <li>Hydratez-vous bien et pratiquez quotidiennement sans sauter de jour.</li>
+        <li>Ajustez le temps du minuteur selon votre aisance.</li>
+        <li>Pour des résultats visibles, soyez régulier·e et patient·e !</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Modale succès -->
+  <div id="complete-modal" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden justify-center items-center">
+    <div class="bg-white px-7 py-8 rounded-xl max-w-sm text-center shadow-lg animate-fade-in">
+      <i class="fa-solid fa-crown main-purple text-4xl mb-4"></i>
+      <h2 class="main-purple font-bold text-2xl mb-2">Félicitations !</h2>
+      <div class="text-gray-700 mb-1">Vous avez complété la routine <span class="font-semibold">15 jours</span>.<br>
+      Continuez pour de meilleurs résultats ou recommencez le programme !</div>
+      <button onclick="resetRoutine()" class="btn-purple rounded-lg px-5 py-2 mt-4 font-semibold shadow-sm outline-none">Recommencer</button>
+    </div>
+  </div>
+
+  <!-- JS for logic -->
+  <script>
+    // --- Données Exercices, libellé & description ---
+    const EXERCISES = [
+      {
+        name: "La mâchoire droite",
+        description: "Inclinez la tête vers l'arrière, regardez le plafond. Avancez doucement la mâchoire inférieure pour sentir un léger étirement sous le menton. Maintenez.",
+        timer: 30
+      },
+      {
+        name: "Le baiser vers le ciel",
+        description: "Levez légèrement la tête, tendez les lèvres vers le plafond comme si vous envoyiez un baiser. Sentez la zone s’étirer sous le menton. Tenez la posture !",
+        timer: 30
+      },
+      {
+        name: "La langue contre le palais",
+        description: "Redressez-vous, pressez la langue fermement contre le palais et inclinez la tête en arrière. Maintenez la pression tout le long.",
+        timer: 30
+      },
+      {
+        name: "L’étirement du cou",
+        description: "Inclinez votre tête lentement de chaque côté, en laissant une main sur la tête pour accentuer l’étirement du cou. Prenez votre temps pour chaque côté.",
+        timer: 30
+      },
+      {
+        name: "Sourire inversé",
+        description: "Tirez les coins de la bouche vers le bas pour former une moue (pout). Tenez la position, ressentez la tension au niveau du cou et du menton.",
+        timer: 25
+      },
+      {
+        name: "Le rouleau de menton",
+        description: "Inclinez la tête vers la poitrine puis effectuez lentement des demi-cercles de gauche à droite en relevant le menton, pour mobiliser la zone sous le menton.",
+        timer: 35
+      },
+      {
+        name: "Massage du double menton",
+        description: "Utilisez le dos des doigts pour masser énergiquement la zone sous le menton en mouvements ascendants, favorisant le drainage et la tonicité.",
+        timer: 40
+      },
+      {
+        name: "La balle sous le menton (optionnel)",
+        description: "Placez une balle souple sous le menton, appuyez fermement pendant quelques secondes, relâchez et recommencez. Stimule la musculation du menton.",
+        timer: 30
+      }
+    ];
+
+    // Routine sur 15 jours : Array d'object {exos:[indices exo]}
+    const ROUTINE = [
+      {exos:[0,1,6]},                // jour1
+      {exos:[2,1,4]},                // jour2
+      {exos:[3,0,5]},                // jour3
+      {exos:[4,2]},                  // jour4
+      {exos:[1,3,5]},                // jour5
+      {exos:[6,0]},                  // jour6
+      {exos:[1,5]},                  // jour7
+      {exos:[2,3,4]},                // jour8
+      {exos:[0,5,7]},                // jour9
+      {exos:[6,1]},                  // jour10
+      {exos:[2,0,3]},                // jour11
+      {exos:[4,5,6]},                // jour12
+      {exos:[1,7]},                  // jour13
+      {exos:[3,4,2]},                // jour14
+      {exos:[7,0,6]}                 // jour15
+    ];
+
+    // --- STATE ---
+    let currentDay = loadCurrentDay();
+    let completedDays = loadCompletedDays();
+    let timerRunning = false;
+    let timerInterval = null;
+    let timerValue = 0;
+
+    // --- Helper Logic: Storage
+    function loadCurrentDay() {
+      const str = localStorage.getItem("adbm_currentDay");
+      return str ? parseInt(str,10) : 0;
+    }
+    function saveCurrentDay() {
+      localStorage.setItem("adbm_currentDay", currentDay);
+    }
+    function loadCompletedDays() {
+      const str = localStorage.getItem("adbm_completedDays");
+      if (str) try { return JSON.parse(str) } catch { return []; }
+      return [];
+    }
+    function saveCompletedDays() {
+      localStorage.setItem("adbm_completedDays", JSON.stringify(completedDays));
+    }
+    function resetRoutine() {
+      completedDays = [];
+      currentDay = 0;
+      saveCompletedDays();
+      saveCurrentDay();
+      renderRoutine();
+      renderProgress();
+      closeModal();
+    }
+
+    // --- Affichage barre progression jours
+    function renderProgress() {
+      let pct = Math.floor((completedDays.length / ROUTINE.length)*100);
+      document.getElementById('progress-bar').style.width = pct+"%";
+      document.getElementById('progress-value').textContent = `${completedDays.length} / 15 jours`;
+      let daysHTML = '';
+      for(let i=0; i<ROUTINE.length; ++i) {
+        let checked = completedDays.includes(i);
+        let cls = "text-xs font-medium py-1 border rounded shadow-sm cursor-pointer select-none bg-white";
+        if (checked) cls += " checked-day main-purple border-purple-700";
+        else if (i===currentDay) cls += " border-purple-400 bg-purple-50 font-bold";
+        else cls += " border-gray-200";
+        daysHTML += `<li class="${cls}" onclick="goToDay(${i})">Jour ${i+1} ${checked ? '<i class="fa-solid fa-check-double ml-1"></i>' : ""}</li>`;
+      }
+      document.getElementById('progress-days').innerHTML = daysHTML;
+    }
+
+    // --- Affichage routine du jour
+    function renderRoutine() {
+      // check end
+      if (completedDays.length===ROUTINE.length) {
+        document.getElementById('complete-modal').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('complete-modal').classList.add('hidden');
+
+      // Création html
+      let r = ROUTINE[currentDay];
+      let html = `
+        <div class="flex items-baseline justify-between mb-4">
+          <h2 class="main-purple text-2xl font-bold"><i class="far fa-calendar-alt mr-2"></i>Jour ${currentDay+1}/15</h2>
+          <span class="text-xs rounded px-2 py-1 bg-purple-50 text-purple-900 font-semibold">${r.exos.length > 1 ? r.exos.length+" exercices" : "1 exercice"}</span>
+        </div>
+        <div>
+        ${r.exos.map((idx,i)=>renderExerciseCard(idx, i)).join('')}
+        </div>
+        <div class="mt-6 text-center">
+          <button onclick="completeDay()" class="btn-purple font-semibold px-7 py-2 rounded-md text-md shadow hover:scale-105 transition-transform no-print">
+            <i class="fa-solid fa-check mr-1"></i>Terminer le jour ${currentDay+1}
+          </button>
+        </div>
+      `;
+      document.getElementById("routine-section").innerHTML = html;
+    }
+
+    // --- Carte exercice journalière, avec minuteur intégré ---
+    function renderExerciseCard(idx, exoNum) {
+      const exo = EXERCISES[idx];
+      const cardId = `ex-card-${exoNum}`;
+      const timerId = `timer-${exoNum}`;
+      const btnId = `btn-timer-${exoNum}`;
+      return `
+      <div class="exercise-card group" id="${cardId}">
+        <h3 class="main-purple font-semibold text-lg mb-1 flex items-center">
+          <span class="mr-2 bg-gradient-to-r from-purple-800 to-pink-400 text-white rounded px-2 py-1 text-sm"><i class="fa-regular fa-star"></i> Exercice ${exoNum+1}</span>
+          ${exo.name}
+        </h3>
+        <p class="mb-2 text-gray-800">${exo.description}</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+          <div class="flex items-center mb-2 sm:mb-0">
+            <i class="fa-solid fa-clock main-purple text-lg"></i>
+            <span class="timer text-xl sm:text-2xl ml-2 select-none" id="${timerId}">${toTimerStr(exo.timer)}</span>
+          </div>
+          <button onclick="startTimer(${exoNum},${exo.timer})" id="${btnId}" class="btn-purple px-4 py-1.5 rounded-lg font-semibold shadow-sm text-base flex items-center focus:outline-none">
+            <i class="fa-solid fa-play mr-2"></i>Lancer le minuteur
+          </button>
+        </div>
+      </div>
+      `;
+    }
+
+    // --- Timer logic ---
+    function toTimerStr(secs) {
+      return (Math.floor(secs/60)).toString().padStart(2,'0')+":"+((secs%60).toString().padStart(2,'0'));
+    }
+    function startTimer(exoNum, duration) {
+      // Stop other timer first
+      clearInterval(timerInterval); timerRunning = false;
+      const timerId = `timer-${exoNum}`;
+      const btnId = `btn-timer-${exoNum}`;
+      let secs = duration; timerValue = secs;
+
+      // Change button state
+      let btn = document.getElementById(btnId);
+      btn.classList.add('opacity-50'); btn.disabled = true;
+
+      let t = document.getElementById(timerId);
+      t.textContent = toTimerStr(secs);
+
+      timerInterval = setInterval(() => {
+        if (secs <= 0) {
+          clearInterval(timerInterval);
+          t.textContent = "✔ Terminé";
+          btn.classList.remove('opacity-50');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Terminé';
+          setTimeout(()=>{
+            btn.innerHTML = '<i class="fa-solid fa-play mr-2"></i>Lancer le minuteur';
+            t.textContent = toTimerStr(duration);
+          }, 2500);
+          return;
+        }
+        secs--;
+        t.textContent = toTimerStr(secs);
+      },1000);
+    }
+
+    // --- Terminer le jour, passer au suivant
+    function completeDay() {
+      if (!completedDays.includes(currentDay)) completedDays.push(currentDay);
+      saveCompletedDays();
+      currentDay = completedDays.length;
+      saveCurrentDay();
+      renderRoutine();
+      renderProgress();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    function goToDay(day) {
+      currentDay = day > ROUTINE.length-1 ? ROUTINE.length-1 : day;
+      saveCurrentDay();
+      renderRoutine();
+      renderProgress();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // --- Modale
+    function closeModal() { document.getElementById('complete-modal').classList.add('hidden'); }
+
+    // Init
+    renderProgress();
+    renderRoutine();
+
+    // expose for onclick
+    window.completeDay = completeDay;
+    window.goToDay = goToDay;
+    window.resetRoutine = resetRoutine;
+    window.startTimer = startTimer;
+  </script>
+</body>
+</html>
+
